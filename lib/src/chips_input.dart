@@ -3,6 +3,61 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+class ChipsInputFormField<T> extends FormField<List<T>> {
+  ChipsInputFormField({
+    FormFieldSetter<List<T>> onSaved,
+    FormFieldValidator<List<T>> validator,
+    List<T> initialValue = const [],
+    bool autovalidate = false,
+    InputDecoration decoration = const InputDecoration(),
+    ValueChanged<List<T>> onChanged,
+    @required ChipsBuilder<T> chipBuilder,
+    @required ChipsBuilder<T> suggestionBuilder,
+    @required ChipsInputSuggestions findSuggestions,
+    int maxChips,
+    TextStyle textStyle,
+    String actionLabel,
+    bool autocorrect = false,
+    TextInputAction inputAction = TextInputAction.done,
+    TextInputType inputType = TextInputType.text,
+    Brightness keyboardAppearance = Brightness.light,
+    bool obscureText = true,
+    double suggestionsBoxMaxHeight,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+  }) : super(
+    onSaved: onSaved,
+    validator: validator,
+    initialValue: initialValue,
+    autovalidate: autovalidate,
+    builder: (FormFieldState<List<T>> state) {
+      final InputDecoration effectiveDecoration = (decoration ?? const InputDecoration());
+      return ChipsInput<T>(
+        initialValue: initialValue,
+        decoration: effectiveDecoration.copyWith(errorText: state.errorText),
+        onChanged: (List<T> data) {
+          if (onChanged != null) {
+            onChanged(data);
+          }
+          state.didChange(data);
+        },
+        chipBuilder: chipBuilder,
+        suggestionBuilder: suggestionBuilder,
+        findSuggestions: findSuggestions,
+        maxChips: maxChips,
+        textStyle: textStyle,
+        actionLabel: actionLabel,
+        autocorrect: autocorrect,
+        inputAction: inputAction,
+        inputType: inputType,
+        keyboardAppearance: keyboardAppearance,
+        obscureText: obscureText,
+        suggestionsBoxMaxHeight: suggestionsBoxMaxHeight,
+        textCapitalization: textCapitalization,
+      );
+    }
+  );
+}
+
 typedef ChipsInputSuggestions<T> = FutureOr<List<T>> Function(String query);
 typedef ChipSelected<T> = void Function(T data, bool selected);
 typedef ChipsBuilder<T> = Widget Function(
