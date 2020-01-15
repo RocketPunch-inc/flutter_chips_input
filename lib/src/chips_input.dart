@@ -224,6 +224,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
       _suggestionsStreamController.add(_suggestions);
     });
     widget.onChanged(_chips.toList(growable: false));
+    FocusScope.of(context).requestFocus(_focusNode);
   }
 
   void deleteChip(T data) {
