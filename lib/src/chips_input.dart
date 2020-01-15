@@ -395,9 +395,6 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   void connectionClosed() {
     print('TextInputClient.connectionCLosed()');
   }
-
-  @override
-  TextEditingValue get currentTextEditingValue => _value;
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {
