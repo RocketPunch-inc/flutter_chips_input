@@ -20,7 +20,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
     bool autocorrect = false,
     TextInputAction inputAction = TextInputAction.done,
     TextInputType inputType = TextInputType.text,
-    Brightness keyboardAppearance = Brightness.light,
+    Brightness keyboardAppearance,
     bool obscureText = true,
     double suggestionsBoxMaxHeight,
     TextCapitalization textCapitalization = TextCapitalization.none,
@@ -131,6 +131,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   LayerLink _layerLink = LayerLink();
   Size size;
   TextOverflow textOverflow;
+  Brightness themeBrightness = Brightness.light;
 
   ChipsInputState(TextOverflow textOverflow) {
     this.textOverflow = textOverflow;
@@ -303,7 +304,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
             autocorrect: widget.autocorrect,
             actionLabel: widget.actionLabel,
             inputAction: widget.inputAction,
-            keyboardAppearance: widget.keyboardAppearance,
+            keyboardAppearance: widget.keyboardAppearance ?? themeBrightness,
             textCapitalization: widget.textCapitalization,
           ));
       _connection.setEditingState(_value);
@@ -322,6 +323,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   Widget build(BuildContext context) {
+    themeBrightness = Theme.of(context).primaryColorBrightness;
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (_suggestionsBoxController._overlayEntry != null) {
       if (currentFocus.hasFocus && !_focusNode.hasFocus) {
@@ -423,7 +425,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
             autocorrect: widget.autocorrect,
             actionLabel: widget.actionLabel,
             inputAction: widget.inputAction,
-            keyboardAppearance: widget.keyboardAppearance,
+            keyboardAppearance: widget.keyboardAppearance ?? themeBrightness,
             textCapitalization: widget.textCapitalization,
           ));
     }
