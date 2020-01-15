@@ -18,6 +18,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
     TextStyle textStyle,
     String actionLabel,
     bool autocorrect = false,
+    bool enableSuggestions = false,
     TextInputAction inputAction = TextInputAction.done,
     TextInputType inputType = TextInputType.text,
     Brightness keyboardAppearance,
@@ -47,6 +48,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
         textStyle: textStyle,
         actionLabel: actionLabel,
         autocorrect: autocorrect,
+        enableSuggestions: enableSuggestions,
         inputAction: inputAction,
         inputType: inputType,
         keyboardAppearance: keyboardAppearance,
@@ -80,7 +82,8 @@ class ChipsInput<T> extends StatefulWidget {
     this.inputType = TextInputType.text,
     this.textOverflow = TextOverflow.clip,
     this.obscureText = false,
-    this.autocorrect = true,
+    this.autocorrect = false,
+    this.enableSuggestions = false,
     this.actionLabel,
     this.inputAction = TextInputAction.done,
     this.keyboardAppearance = Brightness.light,
@@ -104,6 +107,7 @@ class ChipsInput<T> extends StatefulWidget {
   final TextOverflow textOverflow;
   final bool obscureText;
   final bool autocorrect;
+  final bool enableSuggestions;
   final String actionLabel;
   final TextInputAction inputAction;
   final Brightness keyboardAppearance;
