@@ -22,7 +22,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
     TextInputAction inputAction = TextInputAction.done,
     TextInputType inputType = TextInputType.text,
     Brightness keyboardAppearance,
-    bool obscureText = true,
+    bool obscureText = false,
     double suggestionsBoxMaxHeight,
     TextCapitalization textCapitalization = TextCapitalization.none,
   }) : super(
