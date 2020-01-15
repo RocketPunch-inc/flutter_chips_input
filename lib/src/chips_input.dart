@@ -117,11 +117,16 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   void _onFocusChanged() {
     if (_focusNode.hasFocus) {
       _openInputConnection();
-      this._initOverlayEntry();
-      this._suggestionsBoxController.open();
+      if (this._suggestionsBoxController._isOpened == false) {
+        this._initOverlayEntry();
+        this._suggestionsBoxController.open();
+      }
     } else {
       _closeInputConnectionIfNeeded(true);
-      this._suggestionsBoxController.close();
+      FocusScopeNode currentFocus = FocusScope.of(context);
+      if (currentFocus.hasFocus && this._suggestionsBoxController._isOpened) {
+        this._suggestionsBoxController.close();
+      }
     }
     setState(() {
       /*rebuild so that _TextCursor is hidden.*/
@@ -165,14 +170,22 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
                                       ? _suggestionBoxHeight - top
                                       : 400),
                             ),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              itemCount: snapshot.data?.length ?? 0,
-                              itemBuilder: (BuildContext context, int index) {
-                                return widget.suggestionBuilder(
-                                    context, this, _suggestions[index]);
+                            child: NotificationListener(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                if (scrollInfo is UserScrollNotification) {
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                }
+                                return true;
                               },
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                padding: EdgeInsets.zero,
+                                itemCount: snapshot.data?.length ?? 0,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return widget.suggestionBuilder(
+                                      context, this, _suggestions[index]);
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -253,6 +266,12 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   Widget build(BuildContext context) {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (_suggestionsBoxController._overlayEntry != null) {
+      if (currentFocus.hasFocus && !_focusNode.hasFocus) {
+        _suggestionsBoxController.close();
+      }
+    }
     var chipsChildren = _chips
         .map<Widget>((data) => widget.chipBuilder(context, this, data))
         .toList();
