@@ -8,6 +8,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
     FormFieldSetter<List<T>> onSaved,
     FormFieldValidator<List<T>> validator,
     List<T> initialValue = const [],
+    List<T> value = const [],
     bool autovalidate = false,
     InputDecoration decoration = const InputDecoration(),
     ValueChanged<List<T>> onChanged,
@@ -34,6 +35,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
       final InputDecoration effectiveDecoration = (decoration ?? const InputDecoration());
       return ChipsInput<T>(
         initialValue: initialValue,
+        value: value,
         decoration: effectiveDecoration.copyWith(errorText: state.errorText),
         onChanged: (List<T> data) {
           if (onChanged != null) {
@@ -69,6 +71,7 @@ class ChipsInput<T> extends StatefulWidget {
   ChipsInput({
     Key key,
     this.initialValue = const [],
+    this.value = const [],
     this.decoration = const InputDecoration(),
     this.enabled = true,
     @required this.chipBuilder,
@@ -89,6 +92,7 @@ class ChipsInput<T> extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.textCapitalization = TextCapitalization.none,
   })  : assert(maxChips == null || initialValue.length <= maxChips),
+        assert(maxChips == null || value.length == 0),
         super(key: key);
 
   final InputDecoration decoration;
@@ -101,6 +105,7 @@ class ChipsInput<T> extends StatefulWidget {
   final ChipsBuilder<T> chipBuilder;
   final ChipsBuilder<T> suggestionBuilder;
   final List<T> initialValue;
+  final List<T> value;
   final int maxChips;
   final double suggestionsBoxMaxHeight;
   final TextInputType inputType;
@@ -327,6 +332,10 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.value.length > 0) {
+      _chips.clear();
+      _chips.addAll(widget.value);
+    }
     themeBrightness = Theme.of(context).primaryColorBrightness;
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (_suggestionsBoxController._overlayEntry != null) {
