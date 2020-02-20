@@ -92,7 +92,6 @@ class ChipsInput<T> extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.textCapitalization = TextCapitalization.none,
   })  : assert(maxChips == null || initialValue.length <= maxChips),
-        assert(maxChips == null || value.length == 0),
         super(key: key);
 
   final InputDecoration decoration;
@@ -337,6 +336,8 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
     if (widget.value.length > 0) {
       _chips.clear();
       _chips.addAll(widget.value);
+    } else {
+      _chips.clear();
     }
     themeBrightness = Theme.of(context).primaryColorBrightness;
     FocusScopeNode currentFocus = FocusScope.of(context);
