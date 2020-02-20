@@ -264,7 +264,9 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   void dispose() {
-    _focusNode?.dispose();
+    if (_focusNode?.canRequestFocus == true || _focusNode?.hasPrimaryFocus == false) {
+      _focusNode?.dispose();
+    }
     _closeInputConnectionIfNeeded(false);
     _suggestionsStreamController.close();
     _suggestionsBoxController.close();
