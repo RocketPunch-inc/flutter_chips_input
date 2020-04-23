@@ -10,6 +10,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
     List<T> initialValue = const [],
     List<T> value = const [],
     bool autovalidate = false,
+    FocusNode focusNode,
     InputDecoration decoration = const InputDecoration(),
     ValueChanged<List<T>> onChanged,
     @required ChipsBuilder<T> chipBuilder,
@@ -36,6 +37,7 @@ class ChipsInputFormField<T> extends FormField<List<T>> {
       return ChipsInput<T>(
         initialValue: initialValue,
         value: value,
+        focusNode: focusNode,
         decoration: effectiveDecoration.copyWith(errorText: state.errorText),
         onChanged: (List<T> data) {
           if (onChanged != null) {
@@ -72,6 +74,7 @@ class ChipsInput<T> extends StatefulWidget {
     Key key,
     this.initialValue = const [],
     this.value = const [],
+    this.focusNode,
     this.decoration = const InputDecoration(),
     this.enabled = true,
     @required this.chipBuilder,
@@ -94,6 +97,7 @@ class ChipsInput<T> extends StatefulWidget {
   })  : assert(maxChips == null || initialValue.length <= maxChips),
         super(key: key);
 
+  final FocusNode focusNode;
   final InputDecoration decoration;
   final TextStyle textStyle;
   final bool enabled;
@@ -133,6 +137,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   int _searchId = 0;
   double _suggestionBoxHeight;
   FocusNode _focusNode;
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? (_focusNode ??= FocusNode());
   TextEditingValue _value = TextEditingValue();
   TextInputConnection _connection;
   _SuggestionsBoxController _suggestionsBoxController;
@@ -166,10 +171,9 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
     if (widget.enabled) {
       this._suggestionsBoxController.close();
       if (widget.maxChips == null || _chips.length < widget.maxChips) {
-        this._focusNode = FocusNode();
-        this._focusNode.addListener(_onFocusChanged);
+        this._effectiveFocusNode.addListener(_onFocusChanged);
         // in case we already missed the focus event
-        if (this._focusNode.hasFocus) {
+        if (this._effectiveFocusNode.hasFocus) {
           this._suggestionsBoxController.open();
         }
       } else
@@ -179,7 +183,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   }
 
   void _onFocusChanged() {
-    if (_focusNode.hasFocus) {
+    if (_effectiveFocusNode.hasFocus) {
       _openInputConnection();
       if (this._suggestionsBoxController._isOpened == false) {
         this._initOverlayEntry();
@@ -273,10 +277,10 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   }
 
   void requestKeyboard() {
-    if (_focusNode.hasFocus) {
+    if (_effectiveFocusNode.hasFocus) {
       _openInputConnection();
     } else {
-      FocusScope.of(context).requestFocus(_focusNode);
+      FocusScope.of(context).requestFocus(_effectiveFocusNode);
     }
     _recalculateSuggestionsBoxHeight();
   }
@@ -290,7 +294,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
       _suggestionsStreamController.add(_suggestions);
     });
     widget.onChanged(_chips.toList(growable: false));
-    FocusScope.of(context).requestFocus(_focusNode);
+    FocusScope.of(context).requestFocus(_effectiveFocusNode);
   }
 
   void deleteChip(T data) {
@@ -342,7 +346,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
     themeBrightness = Theme.of(context).primaryColorBrightness;
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (_suggestionsBoxController._overlayEntry != null) {
-      if (currentFocus.hasFocus && !_focusNode.hasFocus) {
+      if (currentFocus.hasFocus && !_effectiveFocusNode.hasFocus) {
         _suggestionsBoxController.close();
       }
     }
@@ -372,7 +376,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
             Flexible(
               flex: 0,
               child: _TextCaret(
-                resumed: _focusNode.hasFocus,
+                resumed: _effectiveFocusNode.hasFocus,
               ),
             ),
           ],
@@ -387,7 +391,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
         onTap: requestKeyboard,
         child: InputDecorator(
           decoration: widget.decoration,
-          isFocused: _focusNode.hasFocus,
+          isFocused: _effectiveFocusNode.hasFocus,
           isEmpty: _value.text.length == 0 && _chips.length == 0,
           child: Wrap(
             children: chipsChildren,
@@ -421,7 +425,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   void performAction(TextInputAction action) {
-    _focusNode.unfocus();
+    _effectiveFocusNode.unfocus();
   }
 
   void _updateTextInputState() {
